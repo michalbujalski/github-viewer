@@ -1,7 +1,8 @@
-import React from 'react'
 import RepositoryTableRow from './RepositoryTableRow'
 import { Repository } from '../models'
 import TableRow from './TableRow'
+import usePagination from '../hooks/usePagination'
+import Pagination from './Pagination'
 
 const RepositoryTable = ({
   data,
@@ -10,8 +11,12 @@ const RepositoryTable = ({
   data: Repository[]
   className?: string
 }) => {
+  const { page, totalPages, setPage, paginatedData } =
+    usePagination<Repository>(0, 7, data)
+  console.log(data.length)
+
   return (
-    <div className={`${className || ''} w-full`}>
+    <div className={`${className || ''} w-[500px]`}>
       {data.length > 0 ? (
         <>
           <TableRow>
@@ -20,13 +25,20 @@ const RepositoryTable = ({
             <div className="font-bold text-lg">Stars</div>
             <div className="font-bold text-lg">Created at</div>
           </TableRow>
-          {data.map((repo) => {
+          {paginatedData.map((repo) => {
             return <RepositoryTableRow key={repo.id} data={repo} />
           })}
         </>
       ) : (
         <div>No data found</div>
       )}
+      <div className="flex justify-center">
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
+      </div>
     </div>
   )
 }
