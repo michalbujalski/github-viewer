@@ -2,11 +2,15 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import SearchInput from './components/SearchInput'
 
 function App() {
+  const handleQueryChange = (v: string) => {
+    console.log(v)
+  }
   return (
     <div className="App">
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
+      <SearchInput onQueryChange={handleQueryChange} />
     </div>
   )
 }
