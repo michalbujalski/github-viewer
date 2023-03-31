@@ -4,14 +4,10 @@ export const calcPages = (perPage: number, total: number) => {
   return Math.ceil(total / perPage)
 }
 
-const usePagination = <T>(
-  startPage: number,
-  itemsPerPage: number,
-  data: T[]
-) => {
+const usePagination = <T>(startPage: number, perPage: number, data: T[]) => {
   const [page, setPage] = useState(startPage)
   const [totalCount, setTotalCount] = useState(data.length)
-
+  const [itemsPerPage, setItemsPerPage] = useState(perPage)
   const totalPages = useMemo(
     () => calcPages(itemsPerPage, data.length),
     [data.length, itemsPerPage]
@@ -27,6 +23,7 @@ const usePagination = <T>(
     totalCount,
     setPage,
     setTotalCount,
+    setItemsPerPage,
     itemsPerPage,
     paginatedData,
   }

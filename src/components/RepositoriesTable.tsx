@@ -11,12 +11,24 @@ const RepositoryTable = ({
   data: Repository[]
   className?: string
 }) => {
-  const { page, totalPages, setPage, paginatedData } =
+  const { page, totalPages, setPage, paginatedData, setItemsPerPage } =
     usePagination<Repository>(0, 7, data)
-  console.log(data.length)
 
   return (
     <div className={`${className || ''} w-[600px]`}>
+      <div>
+        <span>Items per page</span>{' '}
+        <select
+          onChange={(e) => {
+            setItemsPerPage(parseInt(e.target.value))
+          }}
+        >
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={15}>15</option>
+        </select>
+      </div>
+
       {data.length > 0 ? (
         <>
           <TableRow>
