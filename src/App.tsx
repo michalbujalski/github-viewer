@@ -3,13 +3,13 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import SearchInput from './components/SearchInput'
-import { searchRepository } from './api'
-import { useDebounce } from './hooks/useDebounce'
+import { useRepositories } from './context/repositories-provider'
 
 function App() {
-  const { debounce } = useDebounce(500)
-  const handleQueryChange = (v: string) => {
-    debounce(() => searchRepository(v))
+  const { fetchRepositories } = useRepositories()
+
+  const handleQueryChange = (query: string) => {
+    fetchRepositories(query)
   }
   return (
     <div className="App">
