@@ -45,6 +45,7 @@ export const RepositoryProvider = ({ children }: { children: ReactNode }) => {
           setData(cached)
           return
         }
+        setError(null)
         setIsLoading(true)
         const repos = await searchRepository(query)
         setData(repos)
