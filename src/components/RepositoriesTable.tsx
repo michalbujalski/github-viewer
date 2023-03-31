@@ -16,7 +16,7 @@ const RepositoryTable = ({
   console.log(data.length)
 
   return (
-    <div className={`${className || ''} w-[500px]`}>
+    <div className={`${className || ''} w-[600px]`}>
       {data.length > 0 ? (
         <>
           <TableRow>
@@ -32,7 +32,7 @@ const RepositoryTable = ({
       ) : (
         <div>No data found</div>
       )}
-      <div className="flex justify-center">
+      <div className="flex justify-center mt-4">
         <Pagination
           currentPage={page}
           totalPages={totalPages}
