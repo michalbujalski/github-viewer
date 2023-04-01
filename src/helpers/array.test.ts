@@ -85,7 +85,6 @@ describe('sorting', () => {
       },
     ]
     const sorted = sortByKey(arr, 'name', 'asc')
-    console.log(sorted)
     const expected = [
       {
         name: 'ca',
