@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
+import useQuery from '../hooks/useQuery'
 
 interface SearchInputProps {
   onQueryChange: (value: string) => unknown
+  initValue: string | null
 }
 
-const SearchInput = ({ onQueryChange }: SearchInputProps) => {
-  const [query, setQuery] = useState('')
+const SearchInput = ({ onQueryChange, initValue }: SearchInputProps) => {
+  const [query, setQuery] = useState(initValue || '')
   const handleQueryUpdate = (value: string) => {
     onQueryChange(value)
     setQuery(value)

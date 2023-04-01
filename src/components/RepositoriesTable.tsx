@@ -1,29 +1,51 @@
 import RepositoryTableRow from './RepositoryTableRow'
 import { Repository } from '../models'
 import TableRow from './TableRow'
-import usePagination from '../hooks/usePagination'
+import usePagination, { ITEMS_PER_PAGE } from '../hooks/usePagination'
 import Pagination from './Pagination'
 import useQuery from '../hooks/useQuery'
+import chevronIcon from '../assets/chevron-down.svg'
 import { ReactNode, useMemo } from 'react'
+import { SortOrder, sortByKey } from '../helpers/array'
+import removeFiltersIcon from '../assets/filter-remove-icon.svg'
 
 const HeaderColumn = ({
   children,
   sortKey,
   setSortBy,
-  slelected,
+  selected,
+  order,
 }: {
   children: ReactNode
-  slelected: boolean
+  selected: boolean
   sortKey: string
-  setSortBy: (key: string) => unknown
+  setSortBy: (key: string, order: SortOrder) => unknown
+  order: SortOrder | undefined
 }) => {
   return (
-    <div className={`font-bold text-lg`}>
+    <div className={`font-bold text-lg flex justify-center`}>
       <button
-        className={`${slelected && 'underline'}`}
-        onClick={() => setSortBy(sortKey)}
+        className={`flex items-center px-2 ${selected && 'bg-neutral-700'}`}
+        onClick={() => {
+          if (selected) {
+            const newOrder = order === 'asc' ? 'desc' : 'asc'
+            setSortBy(sortKey, newOrder)
+          } else {
+            setSortBy(sortKey, order || 'asc')
+          }
+        }}
       >
         {children}
+
+        {selected ? (
+          <span>
+            <img
+              alt="icon"
+              src={chevronIcon}
+              className={`ml-4 ${order === 'asc' && 'rotate-180'}`}
+            />
+          </span>
+        ) : null}
       </button>
     </div>
   )
@@ -37,58 +59,98 @@ const RepositoryTable = ({
   className?: string
 }) => {
   const { updateQuery, query } = useQuery()
-  const sortKey = useMemo(() => {
+  const sortKey = useMemo<keyof Repository | null>(() => {
     return query.get('sortBy')
+      ? (query.get('sortBy') as keyof Repository | null)
+      : null
   }, [query.get('sortBy')])
 
-  const { page, totalPages, setPage, paginatedData, setItemsPerPage } =
-    usePagination<Repository>(0, 7, data)
-  const setSortBy = (key: string) => {
-    updateQuery([['sortBy', key]])
+  const order = useMemo<SortOrder | undefined>(() => {
+    return query.get('order') as SortOrder
+  }, [query.get('order')])
+
+  const sortedData = useMemo(() => {
+    if (!sortKey || !order || data.length === 0) {
+      return data
+    } else {
+      return sortByKey(data, sortKey, order)
+    }
+  }, [data, sortKey, order])
+
+  const {
+    page,
+    totalPages,
+    updatePage,
+    paginatedData,
+    updateItemsPerPage,
+    itemsPerPage,
+  } = usePagination<Repository>(useMemo(() => sortedData, [sortedData]))
+
+  const setSortBy = (key: string, order: SortOrder) => {
+    updateQuery([
+      ['sortBy', key],
+      ['order', order],
+    ])
   }
+  const handleRemoveFilter = () => {
+    updateQuery([], ['sortBy', 'order'])
+  }
+
   return (
     <div className={`${className || ''} w-[600px]`}>
-      <div className="mb-4">
-        <span>Items per page</span>{' '}
+      <div className="mb-4 flex justify-end items-center">
+        <span>Items per page</span>
         <select
+          value={itemsPerPage}
           onChange={(e) => {
-            setItemsPerPage(parseInt(e.target.value))
+            updateItemsPerPage(parseInt(e.target.value))
           }}
+          className="mr-4"
         >
-          <option value={5}>5</option>
-          <option value={10}>10</option>
-          <option value={15}>15</option>
+          {ITEMS_PER_PAGE.map((item) => {
+            return (
+              <option key={'item-' + item} value={item}>
+                {item}
+              </option>
+            )
+          })}
         </select>
+        <button onClick={handleRemoveFilter}>
+          <img src={removeFiltersIcon} alt="remove-filters" />
+        </button>
       </div>
-      {data.length > 0 ? (
+      {sortedData.length > 0 ? (
         <>
-          <div>{sortKey}</div>
           <TableRow>
             <HeaderColumn
               sortKey={'name'}
               setSortBy={setSortBy}
-              slelected={sortKey === 'name'}
+              selected={sortKey === 'name'}
+              order={order}
             >
               Name
             </HeaderColumn>
             <HeaderColumn
               sortKey={'owner'}
               setSortBy={setSortBy}
-              slelected={sortKey === 'owner'}
+              selected={sortKey === 'owner'}
+              order={order}
             >
               Owner
             </HeaderColumn>
             <HeaderColumn
               sortKey={'stars'}
               setSortBy={setSortBy}
-              slelected={sortKey === 'stars'}
+              selected={sortKey === 'stars'}
+              order={order}
             >
               Stars
             </HeaderColumn>
             <HeaderColumn
               sortKey={'createdAt'}
               setSortBy={setSortBy}
-              slelected={sortKey === 'createdAt'}
+              selected={sortKey === 'createdAt'}
+              order={order}
             >
               Created at
             </HeaderColumn>
@@ -104,7 +166,7 @@ const RepositoryTable = ({
         <Pagination
           currentPage={page}
           totalPages={totalPages}
-          onPageChange={setPage}
+          onPageChange={updatePage}
         />
       </div>
     </div>
