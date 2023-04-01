@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import useQuery from '../hooks/useQuery'
+import { useState } from 'react'
 
 interface SearchInputProps {
   onQueryChange: (value: string) => unknown
